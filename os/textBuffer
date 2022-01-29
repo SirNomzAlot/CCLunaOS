@@ -1,0 +1,67 @@
+os.loadAPI("/os/graphics")
+
+local buffer={}
+local ids={}
+
+function addText(id,x,y,text)
+	buffer[id]={x,y,text,true}
+	ids[#ids+1]=id
+end
+
+function addTextVis(id,x,y,text,visible)
+	buffer[id]={x,y,text,visible}
+	ids[#ids+1]=id
+end
+
+function makeVisible(id)
+	buffer[id][4]=true
+end
+
+function invertVis(id)
+	buffer[id][4]=not buffer[id][4]
+end
+
+function getVal(id,key)
+	return buffer[id][key]
+end
+
+function setVal(id,key,val)
+	buffer[id][key]=val
+end
+
+function addChar(id,char)
+	if buffer[id]~=nil and buffer[id][5] then
+		buffer[id][4]=buffer[id][4]..char
+	end
+end
+
+function removeText(id)
+	buffer[id]=nil
+	for i=1,#ids do
+		if ids[i]==id then
+			ids[i]=nil
+			break
+		end
+	end
+end
+
+function removeAll()
+	buffer={}
+	ids={}
+end
+
+function drawBuffer()
+	for i=1,#ids do
+		if buffer[ids[i]][4] then
+			graphics.write(buffer[ids[i]][1],buffer[ids[i]][2],buffer[ids[i]][3])
+		end
+	end
+end
+
+function tester()
+	addText("tst",5,5,"THIS IS NOT A TEST")
+	drawBuffer()
+	graphics.drawScreen()
+end
+
+--tester()

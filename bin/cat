@@ -1,0 +1,38 @@
+local args = { ... }
+local file = nil
+
+if #args > 1 then
+  print("Usage: cat [file]")
+  return
+end
+
+if #args == 1 then
+  local f = args[1]
+
+  if not fs.exists(f) then
+        print("cat: " .. f .. ": No such file")
+        return
+  end
+
+  if fs.isDir(f) then
+        print("cat: " .. f .. ": Is a directory")
+  end
+
+  file = fs.open(f, 'r')
+end
+
+local line = nil
+
+while true do
+  if file ~= nil then
+        line = file.readLine()
+  else
+        line = read()
+  end
+
+  if line ~= nil then
+        print(line)
+  else
+        return
+  end
+end

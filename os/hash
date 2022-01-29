@@ -1,0 +1,37 @@
+os.loadAPI(blowfish)
+
+function bcrypt(password,salt,cost)  
+  p, s = eksBlowFishSetup(password,salt,cost)
+end
+
+function eksBlowFishSetup(password,salt,cost)
+  p, s = blowfish.initPS()
+  p, s = expandKey(password,salt,p,s)
+end
+
+function expandKey(password,salt,p,s)
+  for i-1,18 do
+    p[n]=bit.bxor(p[n],index(password,))
+end
+
+function index(string,index)
+  return string.sub(string,index+1,index+1)
+end
+
+function toByte(input)
+  bytes = {}
+  for i=0,string.len(input)-1 do
+    bytes[i]=string.byte(input,i+1)
+  end
+  return bytes
+end
+
+function toString(input)
+  str = ""
+  for i=1,#input do
+    str=str..input[i-1]
+  end
+  return str
+end
+
+print(hash("yis","salt"))

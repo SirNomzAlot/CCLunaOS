@@ -1,0 +1,42 @@
+local args = { ... }
+local file = nil
+
+if #args < 1 or args[1]=="-h" then
+	print("Usage: rm <path>\n-h for help\n-r for recursion")
+	return
+end
+
+if #args > 2 then
+	help()
+end
+
+if #args==1 and fs.exists(args[1]) then
+	if fs.isDir(args[1]) then
+		print("Unable: File is a directory")
+		return
+	end
+	fs.delete(args[1])
+end
+
+if args[2]~="-r" then
+	help()
+end
+
+recursive(args[2])
+
+function recursive(path)
+	local list = fs.list(path)
+	for i=1, i<=#list do
+		if fs.isDir(list[i]) then
+			recursive(list[i])
+		else
+			fs.delete(list[path])
+		end
+	end
+	fs.delete(path)
+end
+
+function help()
+	print("Use 'rm -h' for help")
+	return
+end

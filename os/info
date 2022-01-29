@@ -1,0 +1,29 @@
+local data = {
+	version = "1.0",
+	description = "Luna OS it exists.",
+	hasUser = false,
+	background = colors.black,
+	text = colors.white,
+	bar = colors.gray,
+	barTop = true
+}
+
+function getData()
+	return data
+end
+
+function edit(key, val)
+	data[key]=val
+	save()
+end
+
+function save()
+	file = fs.open("/os/infoSaved","w")
+	file.write(textutils.serialize(data))
+	file.close()
+end
+
+function load()
+	file=fs.open("/os/infoSaved","r")
+	data = textutils.unserialize(file.readAll())
+end

@@ -1,0 +1,22 @@
+local args = { ... }
+local file = nil
+
+if #args < 1 or args[1]=="-h" then
+	print("Usage: rm <path>\n-h for help\n-r for recursion")
+	return
+end
+
+if #args==1 then
+	if fs.isDir(args[1]) then
+		print("Unable: Directory Exists")
+		help()
+	else
+		fs.makeDir(args[1])
+		return
+	end
+end
+
+function help()
+	print("Use 'mkdir -h' for help")
+	return
+end

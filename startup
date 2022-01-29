@@ -1,0 +1,12 @@
+os.loadAPI("/os/info")
+term.clear()
+term.setCursorPos(1,1)
+print("CIOS V1")
+print("Booting to Luna OS V" .. info.getData()["version"])
+sleep(0.25)
+textutils.slowPrint("##########")
+sleep(0.25)
+term.clear()
+term.setCursorBlink(false)
+function term.setCursorBlink() end
+shell.run("/os/luna.lua")

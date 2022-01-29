@@ -1,0 +1,264 @@
+local w, h = term.getSize()
+
+local screenT={}
+local screenTC={}
+local screenBC={}
+
+local typeText={}
+
+--clear()
+
+local ex = w
+local ey = h+1
+
+local function setData(x,y,text,tColor,hColor)
+	screenT[x][y]=text
+	screenTC[x][y]=tColor
+	screenBC[x][y]=hColor
+end
+
+local function drawChar(x,y,text,tColor,hColor)
+	-- term.setCursorPos(x,y)
+	-- term.setTextColor(tColor)
+	-- term.setBackgroundColor(hColor)
+	-- term.write(text)
+	setData(x,y,text,tColor,hColor)
+end
+
+local function drawPixel(x,y,hColor)
+	-- term.setCursorPos(x,y)
+	-- --term.setTextColor(nil)
+	-- term.setBackgroundColor(hColor)
+	-- term.write(" ")
+	setData(x,y," ",1,hColor)
+end
+
+function copy(orig)
+	local orig_type = type(orig)
+	local copy = {}
+	for orig_key, orig_value in pairs(orig) do
+		copy[orig_key] = {}
+		for orig_key2, orig_val2 in pairs(orig[orig_key]) do
+			copy[orig_key][orig_key2] = orig_val2
+		end
+	end
+	return copy
+end
+
+function cursorEnd(x,y)
+	ex=x
+	ey=y
+end
+
+function cursorAdd()
+	if ex==w then
+		ex=1
+		ey=ey+1
+		return
+	end
+	ex=ex+1
+end
+
+function moveCursor(x,y)
+	ex=ex+x
+	ey=ey+y
+end
+
+function ttAdd(char)
+	typeText[ex][ey]=char
+	cursorAdd()
+end
+
+function ttSub()
+	typeText[ex-1][ey]=" "
+	moveCursor(-1,0)
+end
+
+function drawBoxF(x,y,sx,sy,color)
+	for i=0,sy-1 do
+		for j=0,sx-1 do
+			drawPixel(x+j,y+i,color)
+		end
+	--drawLine(x,y+i,x+sx-1,y+i,color)
+	end
+end
+
+function drawBoxE(x,y,sx,sy,color)
+	drawLine(x,y,x+sx-1,y,color)
+	drawLine(x+sx-1,y,x+sx-1,y+sx-1,color)
+	drawLine(x,y+sx-1,x+sx-1,y+sx-1,color)
+	drawLine(x,y,x,y+sx-1,color)
+end
+
+function printC(y,s)
+	local x = math.floor((w-string.len(s))*0.5)
+	writeWhite(x,y,s)
+end
+
+function writeColor(x,y,text,tColor)
+	for i=0,string.len(text)-1 do
+		drawChar(x+i,y,string.sub(text,i+1,i+1),tColor,screenBC[x+i][y])
+	end
+end
+
+function write(x,y,text) 
+	writeColor(x,y,text,colors.white)
+end
+
+function writeFull(x,y,text,tColor,bColor)
+	for i=0,string.len(text)-1 do
+		drawCar(x+i,y,string.sub(text,i,i+1),tColor,bColor)
+	end
+end
+
+function drawSimpleLineX(x,y,sx,color)
+	for i=0,sx-1 do
+		drawPixel(x+i,y,color)
+	end
+end
+
+function drawSimpleLineY(x,y,sy,color)
+	for i=0,sy-1 do
+		drawPixel(x,y+i,color)
+	end
+end
+
+function drawLine(x1,y1,x2,y2,color) 
+	x1 = math.floor(x1)
+	y1 = math.floor(y1)
+	x2 = math.floor(x2)
+	y2 = math.floor(y2)
+	if x1 == x2 and y1 == y2 then
+		drawPixel( x1, y1, color)
+		return
+	end
+	local minX = math.min( x1, x2 )
+	if minX == x1 then
+		minY = y1
+		maxX = x2
+		maxY = y2
+	else
+		minY = y2
+		maxX = x1
+		maxY = y1
+	end
+	local xDiff = maxX - minX
+	local yDiff = maxY - minY	
+	if xDiff > math.abs(yDiff) then
+		local y = minY
+		local dy = yDiff / xDiff
+		for x=minX,maxX do
+			drawPixel( x, math.floor( y + 0.5 ),color)
+			y = y + dy
+		end
+	else
+		local x = minX
+		local dx = xDiff / yDiff
+		if maxY >= minY then
+			for y=minY,maxY do
+				drawPixel( math.floor( x + 0.5 ), y,color)
+				x = x + dx
+			end
+		else
+			for y=minY,maxY,-1 do
+			drawPixel( math.floor( x + 0.5 ), y,color)
+			x = x - dx
+			end
+		end
+	end
+end
+
+function ttClear()
+	for i=1, w do
+		typeText[i]={}
+	end
+end
+
+function ttLineClear(line)
+	typeText[line]={}
+end
+
+function clear()
+	term.clear()
+	term.setCursorPos(w,h+1)
+	for i=1,w do
+		screenT[i]={}
+		screenTC[i]={}
+		screenBC[i]={}
+		-- for k=1,h do
+		-- 	screenBC[i][k]=colors.black
+		-- 	screenT[i][k]=" "
+		-- 	screenTC[i][k]=1
+		-- end
+	end
+end
+
+function loadImage(path)
+	return paintutils.loadImage(path)
+end
+
+function drawImage(img,xPos,yPos)
+	for y=1,#img do
+		local tLine = img[y]
+		for x=1,#tLine do
+			if tLine[x] > 0 then
+				drawPixel( x + xPos - 1, y + yPos - 1 ,tLine[x])
+			end
+		end
+	end
+end
+
+local function printPixel(x,y,text,tColor,hColor)
+	term.setCursorPos(x,y)
+	term.setTextColor(tColor)
+	term.setBackgroundColor(hColor)
+	term.write(text)
+end
+
+function drawScreen()
+	for y=1,h do
+		term.setCursorPos(1,y)
+		for x=1,w do
+			t, tc, bc = getScreenData(x,y)
+			--term.setTextColor(tc)
+			term.setBackgroundColor(bc)
+			if t=="" or t==" " then
+				term.write(typeText[x][y] or t)
+			else
+				term.write(t)
+			end
+		end
+	end
+	term.setCursorPos(ex,ey)
+end
+
+function getTextAt(x,y)
+	return screenT[x][y] or ""
+end
+
+function getTextColorAt(x,y)
+	return screenTC[x][y] or 1
+end
+
+function getBackgroundColorAt(x,y)
+	return screenBC[x][y] or colors.black
+end
+
+function getScreenData(x,y)
+	return getTextAt(x,y),getTextColorAt(x,y),getBackgroundColorAt(x,y)
+end
+
+function tester()
+	while true do
+		clear()
+		drawBoxF(3,3,3,3,colors.white);
+		writeColor(1,1,"penis",colors.gray);
+		drawScreen()
+		sleep(0.1)
+	end
+end
+
+clear()
+ttClear()
+--tester()
+-- drawScreen()

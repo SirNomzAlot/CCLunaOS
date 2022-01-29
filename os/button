@@ -1,0 +1,74 @@
+os.loadAPI("/os/graphics")
+os.loadAPI("/os/info")
+
+local buttons = {}
+local ids = {}
+
+function makeButton(id,x,y,sx,sy,text,color,visible,action)
+	button={x=x,y=y,sx=sx,sy=sy,text=text,color=color,visible=visible,action=action}
+	buttons[id]=button
+	ids[#ids+1]=id
+end
+
+function setVal(id,key,val)
+	buttons[id][key]=val
+end
+
+function getVal(id,key)
+	return buttons[id][key]
+end
+
+function drawButton(id)
+	button=buttons[id]
+	x=button["x"]
+	y=button["y"]
+	sx=button["sx"]
+	sy=button["sy"]
+	text=button["text"]
+	color=button["color"]
+	if button["visible"]==false then
+		return
+	end
+	graphics.drawBoxF(x,y,sx,sy,color)
+	graphics.write(math.floor((sx/2)-#text/2)+x,math.floor(sy/2)+y,text)
+	--term.setBackgroundColor(info.getData()["background"])
+end
+
+function drawButtons()
+	for i=1,#ids do
+		drawButton(ids[i])
+	end
+end
+
+function click(x,y)
+	for i=1,#ids do
+		button = buttons[ids[i]]
+		term.setCursorPos(10,10)
+		if x<=button["sx"]+button["x"]-1 and x>=button["x"] and y<=button["sy"]+button["y"]-1 and y>= button["y"] and button["visible"] then
+			button["action"]()
+		end
+	end
+end
+
+function softPress(id)
+	if buttons[id]["visible"] then
+		buttons[id]["action"]()
+	end
+end
+
+function tester() 
+	makeButton("fat",2,2,4,4,"fak u",colors.blue,true,
+	function()
+	graphics.write(10,10,"no u")
+	end)
+	graphics.drawScreen()
+	while true do
+		event, button, x, y = os.pullEvent("mouse_click")
+		if event then
+			click(x,y)
+		end
+		graphics.drawScreen()
+	end
+end
+
+--tester()

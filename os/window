@@ -1,0 +1,58 @@
+os.loadAPI("/os/graphics")
+
+local stack = {}
+local window = {}
+local ids = {}
+
+-- string, int, int, int, int, string, button array, boolean
+function makeWindowComplex(id,x,y,sx,sy,title,buttons,fullscreen)
+	if y>2 then
+		y=2
+	end
+	if x>1 then
+		x=1
+	end
+	window[id]={x=x,y=y,sx=sx,sy=sy,title=title,buttons=buttons,fullscreen=fullscreen,data={}}
+	ids[#ids+1]=id
+end
+
+-- string, int, int, int, int, string
+function makeWindow(id,sx,sy,title)
+	makeWindowComplex(id,1,2,sx,sy,title,{},false)
+	stacker(id)
+end
+
+function stacker(window)
+	newStack = {window}
+	for i=1,#stack do
+		newStack[i+1]=stack[i]
+	end
+	stack = newStack
+end
+
+-- string
+function softDelete(id)
+	window[id]=nil
+	for i=1,#ids do
+		if ids[i]==id then
+			ids[i]=nil
+		end
+	end
+end
+
+function windowDrag(x,y)
+	for i=1,#stack do
+		wx = window[stack[i]]["x"]
+		wsx = window[stack[i]]["sx"]
+		wy = window[stack[i]]["y"]
+		wsy = window[stack[i]]["sy"]
+		if x>=wx and x<=x+wsx then
+			if y>=wy and y<=wy+wsy-1 then
+				--doshit
+			elseif y>=wy and y==wy then
+				window[stack[i]]["x"]=x
+				window[stack[i]]["y"]=y
+			end
+		end
+	end
+end
